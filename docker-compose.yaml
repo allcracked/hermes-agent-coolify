@@ -1,0 +1,30 @@
+# Hermes Agent — Coolify deployment
+# Pulls the prebuilt image from Docker Hub; no build on Coolify.
+# Telegram runs in long-polling mode (no inbound port needed).
+# Dashboard service is intentionally omitted to fit on a 2 GB VPS.
+
+services:
+  gateway:
+    image: nousresearch/hermes-agent:latest
+    pull_policy: always
+    restart: unless-stopped
+    volumes:
+      - hermes-data:/opt/data
+    environment:
+      - HERMES_UID=10000
+      - HERMES_GID=10000
+      - TZ=America/Tegucigalpa
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_ALLOWED_USERS=${TELEGRAM_ALLOWED_USERS}
+      - TELEGRAM_HOME_CHANNEL=${TELEGRAM_HOME_CHANNEL:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    deploy:
+      resources:
+        limits:
+          memory: 750M
+    command: ["gateway", "run"]
+
+volumes:
+  hermes-data:
